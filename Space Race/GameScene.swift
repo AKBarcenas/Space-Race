@@ -8,35 +8,44 @@
 
 import SpriteKit
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
+    var starfield: SKEmitterNode!
+    var player: SKSpriteNode!
+    
+    var scoreLabel: SKLabelNode!
+    var score: Int = 0 {
+        didSet {
+            scoreLabel.text = "Score: \(score)"
+        }
+    }
+    
     override func didMoveToView(view: SKView) {
-        /* Setup your scene here */
-        let myLabel = SKLabelNode(fontNamed:"Chalkduster")
-        myLabel.text = "Hello, World!"
-        myLabel.fontSize = 45
-        myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
+        backgroundColor = UIColor.blackColor()
         
-        self.addChild(myLabel)
+        starfield = SKEmitterNode(fileNamed: "Starfield")!
+        starfield.position = CGPoint(x: 1024, y: 384)
+        starfield.advanceSimulationTime(10)
+        addChild(starfield)
+        starfield.zPosition = -1
+        
+        player = SKSpriteNode(imageNamed: "player")
+        player.position = CGPoint(x: 100, y: 384)
+        player.physicsBody = SKPhysicsBody(texture: player.texture!, size: player.size)
+        player.physicsBody!.contactTestBitMask = 1
+        addChild(player)
+        
+        scoreLabel = SKLabelNode(fontNamed: "Chalkduster")
+        scoreLabel.position = CGPoint(x: 16, y: 16)
+        scoreLabel.horizontalAlignmentMode = .Left
+        addChild(scoreLabel)
+        
+        score = 0
+        
+        physicsWorld.gravity = CGVector(dx: 0, dy: 0)
+        physicsWorld.contactDelegate = self
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-       /* Called when a touch begins */
-        
-        for touch in touches {
-            let location = touch.locationInNode(self)
-            
-            let sprite = SKSpriteNode(imageNamed:"Spaceship")
-            
-            sprite.xScale = 0.5
-            sprite.yScale = 0.5
-            sprite.position = location
-            
-            let action = SKAction.rotateByAngle(CGFloat(M_PI), duration:1)
-            
-            sprite.runAction(SKAction.repeatActionForever(action))
-            
-            self.addChild(sprite)
-        }
     }
    
     override func update(currentTime: CFTimeInterval) {
