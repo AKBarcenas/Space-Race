@@ -31,6 +31,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // Keeps track of whether or not the game has ended.
     var gameOver = false
     
+    /*
+     * Function Name: didMoveToView
+     * Parameters: view - the view that called this method.
+     * Purpose: This method sets up the visual environment of the game and starts the enemy creation.
+     * Return Value: None
+     */
+    
     override func didMoveToView(view: SKView) {
         backgroundColor = UIColor.blackColor()
         
@@ -104,6 +111,45 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sprite.physicsBody?.angularVelocity = 5
         sprite.physicsBody?.linearDamping = 0
         sprite.physicsBody?.angularDamping = 0
+    }
+    
+    /*
+     * Function Name: touchesMoved
+     * Parameters: touches - the touches that occurred during the event.
+     *   event - the event that describes the touches.
+     * Purpose: This method moves the player as long as the movement is within the bounds of the game.
+     * Return Value: None
+     */
+    
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        var location = touch.locationInNode(self)
+        
+        if location.y < 100 {
+            location.y = 100
+        } else if location.y > 668 {
+            location.y = 668
+        }
+        
+        player.position = location
+    }
+    
+    /*
+     * Function Name: didBeginContact
+     * Parameters: contact - describes the contact that occurred.
+     * Purpose: This method causes the player to explode when a collision with debris occurs and
+     *   ends the game.
+     * Return Value: None
+     */
+    
+    func didBeginContact(contact: SKPhysicsContact) {
+        let explosion = SKEmitterNode(fileNamed: "explosion")!
+        explosion.position = player.position
+        addChild(explosion)
+        
+        player.removeFromParent()
+        
+        gameOver = true
     }
     
 }
